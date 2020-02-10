@@ -1,0 +1,50 @@
+---
+title: "2.03_Exploratory_Data_Analysis"
+output: html_document
+---
+
+# Load dependencies:
+```{r}
+# Load dependencies:
+# Install cran packages
+list.of.packages <- c("BiocManager")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+# Install Bioconductor packages
+bioc.packages <- c("DESeq2")
+new.bioc.packages <- bioc.packages[!(bioc.packages %in% installed.packages()["Package"])]
+if(length(new.bioc.packages)) BiocManager::install(new.bioc.packages)
+
+
+# load dependencies
+library("DESeq2")
+
+```
+# RNA-seq DGE methods:
+
+DESeq2, edgeR are the two most commonly used packages
+
+limma/voom is commonly used, but may not be sensitive enough for experiments that don’t have very many biological replicates.
+
+![Steps in differential expression analysis:](../Input_Data/DGE-steps.png)
+
+* Why do we use unnormalized counts as input for DESeq2? 
+* DESeq2 assumes the input is raw counts and will internally correct for the library size when performing the analysis.
+
+organizing your data: the row names of the metadata needs to be in the same order of the colnames of your raw counts data.
+
+```{r}
+# This can be checked with: 
+all(rownames(smoc2_metadata) == colnames(smoc2_rawcounts))
+
+# Matching order between vectors:
+idx <- match(colnames(smoc2_rawcounts), rownames(smoc2_metadata))
+reordered_smoc2_metadata <- smoc2_metadata[idx, ]
+all(rownames(reordered_smoc2_metadata) == colnames(smoc2_rawcounts))   
+
+# Creating the DeSeq2 object:
+library()
+dds_smoc2 <- DESeqDataSetFromMatrix(countData = smoc2_rawcounts,                               colData = reordered_smoc2_metadata, design = ~ condition)
+
+```
