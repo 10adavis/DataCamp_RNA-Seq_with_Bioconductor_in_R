@@ -74,7 +74,6 @@ raw_smoc2_counts <- counts(dds_smoc2, normalized=FALSE)
 
 
 ## Unsupervised clustering
-
 ```{r}
 # Transform across the normalized counts using the variance stabilizing transformation (blind = TRUE means its blind to the sample information)
 vsd_smoc2 <- vst(dds_smoc2, blind=TRUE)
@@ -96,3 +95,9 @@ pheatmap(vsd_cor_smoc2, annotation = select(smoc2_metadata, condition))
 ```
 
 ## PCA
+```{r}
+# Plot PCA  (color samples according to condition)
+plotPCA(vsd_smoc2, intgroup="condition")
+```
+You want to see your groups/conditions separated by PC1. If not, there may be other sources of variation.
+
