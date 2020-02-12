@@ -101,3 +101,5 @@ plotPCA(vsd_smoc2, intgroup="condition")
 ```
 You want to see your groups/conditions separated by PC1. If not, there may be other sources of variation.
 
+
+
