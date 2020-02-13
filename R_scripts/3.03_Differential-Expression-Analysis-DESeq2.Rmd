@@ -58,6 +58,48 @@ plotDispEsts(dds_smoc2)
 * Worrisome plots include a cloud of black dots that dont follow the red line, or dispersions that don't decrease with increasing mean expression. These are typically caused by outliers or contamination in your data
 
 
-
 ## DESeq2 model - exploring dispersions:
 
+![](../Input_Data/nbm.png)
+
+![](../Input_Data/calc.png)
+
+By default DESeq2 will use the Wald test for pair wise comparisons to test for differences in expression for the 2 conditions of interest.
+
+### Results can be extracted by:
+```{r}
+results(dds_smoc2, alpha = 0.05)
+#### lower alpha is more strict; 0.05 is standard
+```
+Note that the results are presented as normal/fibrosis, which is the opposite of what you would want to present
+
+Therefore, you may want to specify the contrasts function, which can be added to the results function
+
+results(dds, contrast = c("condition_factor", "level_to_compare", "base_level"),          alpha = 0.05)
+
+### Set up the contrasts:
+```{r}
+smoc2_res <- results(dds_smoc2, contrast = c("condition", "fibrosis",              "normal"), alpha = 0.05)
+
+smoc2_res
+```
+
+## DESeq2 LFC shrinkage
+```{r}
+# The MA plot plots the mean of normalized counts against log2 fold change.
+plotMA(smoc2_res, ylim=c(-8,8))
+```
+
+# To improve the estimated fold changes, you can shrink the fold changes:
+```{r}
+smoc2_res <- lfcShrink(dds_smoc2, contrast=c("condition", "fibrosis", "normal"), res=smoc2_res)
+
+# Then regenerate the MA plot:
+plotMA(smoc2_res, ylim=c(-8,8))
+```
+
+#### This doesn't reduce the number of significant genes, but reduce the log2FC values
+
+
+## DESeq2 Results:
+```
