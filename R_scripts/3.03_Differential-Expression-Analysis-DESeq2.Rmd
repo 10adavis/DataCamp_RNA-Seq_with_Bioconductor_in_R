@@ -3,6 +3,15 @@ title: "3.03_Differential-Expression-Analysis-DESeq2"
 output: html_document
 ---
 
+# Load dependencies:
+```{r}
+# load dependencies
+install.packages("devtools")
+devtools::install_github("stephenturner/annotables")
+
+library("annotables")
+```
+
 ## Overview of the DE Analysis:
 3 main steps of DESeq2:
 1. Fit raw counts for each gene to the DESeq2 negative binomial model and testing for differential expression
@@ -98,8 +107,62 @@ smoc2_res <- lfcShrink(dds_smoc2, contrast=c("condition", "fibrosis", "normal"),
 plotMA(smoc2_res, ylim=c(-8,8))
 ```
 
-#### This doesn't reduce the number of significant genes, but reduce the log2FC values
+#### This doesn't reduce the number of significant genes, but it does reduce the log2FC values
 
 
 ## DESeq2 Results:
+```{r}
+mcols(smoc2_res)
 ```
+
+### Summary:
+```{r}
+summary(smoc2_res)c
+```
+### you can
+```{r}
+# you can add lfc threshold:
+smoc_res_lfc_cutoff <- results(dds_smoc2, 
+                  contrast = c("condition", "fibrosis", "normal"), 
+                  alpha = 0.05, 
+                  lfcThreshold = 0.32)
+
+smoc2_res <- lfcShrink(dds_smoc2, 
+                    contrast=c("condition", "fibrosis", "normal"), 
+                    res=smoc_res_lfc_cutoff)
+
+
+summary(smoc_res_lfc_cutoff)
+```
+###Annotate results:
+```{r}
+install.packages("annotables")
+library(annotables)
+grcm38
+
+smoc_res_lfc_cutoff_all <- data.frame(smoc_res_lfc_cutoff) %>% 
+              rownames_to_column(var = "ensgene") %>%
+              left_join(x = smoc_res_lfc_cutoff, 
+                        y = grcm38[, c("ensgene", "symbol", "description")], 
+                        by = "ensgene") 
+
+
+smoc_res_lfc_cutoff_all_sig <- subset(smoc_res_lfc_cutoff_all, padj < 0.05)
+```
+
+
+
+
+
+
+
+
+
+results:
+
+###
+
+### 
+
+
+## DESeq2 Result
