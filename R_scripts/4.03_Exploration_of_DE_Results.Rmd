@@ -1,0 +1,54 @@
+---
+title: "4.03_Exploration_of_DE_Results"
+output: html_document
+---
+
+# Load dependencies:
+```{r}
+# load dependencies
+install.packages("devtools")
+devtools::install_github("stephenturner/annotables")
+
+library("annotables")
+library("ggplot2")
+```
+
+
+
+# Plot volcano plot:
+```{r}
+# Generate logical column 
+smoc2_res_all <- data.frame(smoc2_res) %>% mutate(threshold = padj < 0.05)
+              
+# Create the volcano plot
+ggplot(smoc2_res_all) + 
+        geom_point(aes(x = log2FoldChange, y = -log10(padj), color = threshold)) + 
+        xlab("log2 fold change") + 
+        ylab("-log10 adjusted p-value") + 
+        theme(legend.position = "none", 
+              plot.title = element_text(size = rel(1.5), hjust = 0.5), 
+              axis.title = element_text(size = rel(1.25)))
+
+```
+
+
+
+### Plot heatmap
+```{r}
+sig_norm_counts_smoc2 <- normalized_smoc2_counts[rownames(smoc2_res_sig), ]
+
+ 
+# Choose heatmap color palette
+heat_colors <- brewer.pal(n = 6, name = "YlOrRd")
+ 
+# Plot heatmap
+pheatmap(sig_norm_counts_smoc2, 
+           color = heat_colors, 
+           cluster_rows = T, 
+           show_rownames = F,
+           annotation = select(smoc2_metadata, condition), 
+           scale = "row")
+```
+
+
+### RNA-seq DE Analysis - experiment planning:
